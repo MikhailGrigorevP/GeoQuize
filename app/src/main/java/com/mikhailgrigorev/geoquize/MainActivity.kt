@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateQuestion() {
-        val question = mQuestionBank[mCurrentIndex].getTextResId()
+        val question = mQuestionBank[mCurrentIndex].textResId
         question_text_view.setText(question)
     }
 
