@@ -1,6 +1,7 @@
 package com.mikhailgrigorev.geoquize
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
@@ -22,6 +23,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        Log.d("QuizActivity", "onCreate(Bundle) called")
 
         question_text_view.setOnClickListener {
             mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.size;
@@ -65,5 +68,29 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    override fun onStart() {
+        super.onStart()
+        Log.d("QuizActivity", "onStart called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("QuizActivity", "onResume called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("QuizActivity", "onPause called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("QuizActivity", "onStop called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("QuizActivity", "onDestroy called")
+    }
 
 }
