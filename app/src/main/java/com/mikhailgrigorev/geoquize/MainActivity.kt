@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private var mCurrentIndex = 0
     private var mCorrectCount = 0
     private var mVoted = 0
+    private var mTips = 0
     private var REQUEST_CODE_CHEAT = 0
     private var mIsCheater: Boolean = false
 
@@ -34,10 +35,13 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("QuizActivity", "onCreate(Bundle) called")
 
+        tips_text_view.text = (3 - mTips).toString()
+
         if(savedInstanceState != null){
             mCurrentIndex=savedInstanceState.getInt("index", 0)
             mCorrectCount=savedInstanceState.getInt("count", 0)
             mVoted=savedInstanceState.getInt("voted", 0)
+            mVoted=savedInstanceState.getInt("tips", 0)
         }
 
         question_text_view.setOnClickListener {
@@ -58,10 +62,18 @@ class MainActivity : AppCompatActivity() {
             updateQuestion()
         }
         cheat_button.setOnClickListener{
-            val answerIsTrue: Boolean = mQuestionBank[mCurrentIndex].isAnswerTrue
-            val intent = Intent(this, CheatActivity::class.java)
-            intent.putExtra("isTrue", answerIsTrue)
-            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            if (mTips < 3){
+                mTips += 1
+                tips_text_view.text = (3 - mTips).toString()
+                val answerIsTrue: Boolean = mQuestionBank[mCurrentIndex].isAnswerTrue
+                val intent = Intent(this, CheatActivity::class.java)
+                intent.putExtra("isTrue", answerIsTrue)
+                startActivityForResult(intent, REQUEST_CODE_CHEAT)
+            }
+            else {
+                Toast.makeText(this, "No tips left" , Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
         prev_button.setOnClickListener {
             mCurrentIndex = (mCurrentIndex - 1)
@@ -132,7 +144,8 @@ class MainActivity : AppCompatActivity() {
         Log.i("QuizActivity", "onSaveInstanceState")
         outState.putInt("index", mCurrentIndex)
         outState.putInt("count", mCorrectCount)
-        outState.putInt("voted", mCorrectCount)
+        outState.putInt("voted", mVoted)
+        outState.putInt("tips", mTips)
     }
 
     override fun onResume() {

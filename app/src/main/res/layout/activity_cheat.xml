@@ -25,4 +25,11 @@
         android:layout_height="wrap_content"
         android:text="@string/show_answer_button"
         tools:ignore="ButtonStyle" />
+
+    <TextView
+        android:id="@+id/sdk_version"
+        android:layout_width="wrap_content"
+        tools:text="Sdk"
+        android:layout_height="wrap_content"
+        android:padding="24dp"/>
 </LinearLayout>
