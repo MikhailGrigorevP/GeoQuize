@@ -1,5 +1,8 @@
 package com.mikhailgrigorev.geoquize
 
+import android.app.Activity
+import android.content.ClipData.newIntent
+import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
@@ -22,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     private var mCurrentIndex = 0
     private var mCorrectCount = 0
     private var mVoted = 0
+    private var REQUEST_CODE_CHEAT = 0
+    private var mIsCheater: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         question_text_view.setOnClickListener {
+            mIsCheater = false
             mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.size
             updateQuestion()
         }
@@ -47,12 +53,19 @@ class MainActivity : AppCompatActivity() {
             checkAnswer(false)
         }
         next_button.setOnClickListener {
+            mIsCheater = false
             mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.size
             updateQuestion()
         }
+        cheat_button.setOnClickListener{
+            val answerIsTrue: Boolean = mQuestionBank[mCurrentIndex].isAnswerTrue
+            val intent = Intent(this, CheatActivity::class.java)
+            intent.putExtra("isTrue", answerIsTrue)
+            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+        }
         prev_button.setOnClickListener {
             mCurrentIndex = (mCurrentIndex - 1)
-            if (mCurrentIndex == -1){
+            if (mCurrentIndex == -1) {
                 mCurrentIndex = mQuestionBank.size - 1
             }
             updateQuestion()
@@ -65,20 +78,38 @@ class MainActivity : AppCompatActivity() {
         question_text_view.setText(question)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != Activity.RESULT_OK){
+            return
+        }
+        if (requestCode == 0){
+            if (data == null){
+                return
+            }
+            mIsCheater = data.getBooleanExtra("Shown", false)
+        }
+
+    }
+
     private fun checkAnswer(userPressedTrue: Boolean) {
         val answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue
         val answered  = mQuestionBank[mCurrentIndex].isAnswered
         var messageResId = R.string.voted_toast
         if (!answered){
-            if (userPressedTrue == answerIsTrue) {
-                mQuestionBank[mCurrentIndex].isAnswered = true
-                messageResId = R.string.correct_toast
+            mQuestionBank[mCurrentIndex].isAnswered = true
+            mVoted += 1
+            if (mIsCheater){
+                messageResId = R.string.judgment_toast
                 mCorrectCount += 1
-                mVoted += 1
-            } else {
-                mQuestionBank[mCurrentIndex].isAnswered = true
-                messageResId = R.string.incorrect_toast
-                mVoted += 1
+            }
+            else{
+                if (userPressedTrue == answerIsTrue) {
+                    messageResId = R.string.correct_toast
+                    mCorrectCount += 1
+                } else {
+                    messageResId = R.string.incorrect_toast
+                }
             }
         }
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT)
