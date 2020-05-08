@@ -1,3 +1,3 @@
 package com.mikhailgrigorev.geoquize
 
-class Question(var textResId: Int, var isAnswerTrue: Boolean)
+class Question(var textResId: Int, var isAnswerTrue: Boolean, var isAnswered: Boolean)
